@@ -35,8 +35,8 @@ function collideWithEnemies(prevBottom) {
     }
   }
   enemies = enemies.filter((enemy) => enemy.alive);   // 生きている敵だけを残す
-}
- 
+}  
+   
 // ④ 描く：配列の敵を1体ずつ取り出して描く
 function drawEnemies() {
   ctx.fillStyle = "#ff6b6b";

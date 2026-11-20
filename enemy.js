@@ -2,7 +2,7 @@
 
 // ① 作る：敵を1体作って返す関数（呼ぶたびに、新しい敵が1体できる）
 function createEnemy(x, vx) {
-  return { x: x, y: floor.y - 32, w: 32, h: 32, vx: vx, alive: true };
+  return { x: x,startX: x, y: floor.y - 32, w: 32, h: 32, vx: vx, alive: true };
 }
 
 // ② 入れる：敵をまとめて入れる配列（７-６で入れ直すので let）
@@ -10,6 +10,9 @@ let enemies = [];
 enemies.push(createEnemy(200, 80));
 enemies.push(createEnemy(380, -120));
 enemies.push(createEnemy(540, 60));
+const special = createEnemy(300, 80);  //見張りの敵初期,位置から左右に80px
+special.type="look";
+enemies.push(special);
 
 // ③ 動かす：配列の敵を1体ずつ取り出して、同じ処理をする
 function updateEnemies(dt) {
@@ -23,6 +26,16 @@ function updateEnemies(dt) {
     if (enemy.x + enemy.w > canvas.width) {
       enemy.x = canvas.width - enemy.w;
       enemy.vx = -enemy.vx;
+    }
+    if(enemy.type === "look"){
+      if(enemy.x > enemy.startX + 80){
+        enemy.x = enemy.startX + 80
+        enemy.vx = -enemy.vx;
+      }
+      if(enemy.x < enemy.startX - 80){
+        enemy.x = enemy.startX - 80
+        enemy.vx = -enemy.vx;
+      }
     }
   }
 }

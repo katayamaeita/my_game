@@ -29,6 +29,12 @@ document.addEventListener("keydown", (e) => {
   }
 });
  
+// タイトルとゲームオーバーでは、クリックでも始められる
+canvas.addEventListener("pointerdown", () => {
+  if (gameState === "title" || gameState === "gameover") {
+    startGame();
+  }
+});
 // 役割ごとの「動かす」関数を呼ぶ
 function update(dt) {
   if (gameState !== "play") {
@@ -72,6 +78,7 @@ function draw() {
   drawStage();
   if (gameState === "title") {
     drawMessage("my game", "Enter で始める");
+    drawAim();
     return;                 // タイトルでは、敵とプレイヤーは描かない
   }
   drawEnemies();
@@ -83,6 +90,7 @@ function draw() {
   if (gameState === "gameover") {
     drawMessage("GAME OVER", "Enter でもう一度");
   }
+  drawAim();                // いちばん最後
 }
 
 let last = performance.now();

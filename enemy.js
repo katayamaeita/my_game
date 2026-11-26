@@ -14,15 +14,11 @@ function resetEnemies() {
   enemies.push(createEnemy(200, 80));
   enemies.push(createEnemy(380, -120));
   enemies.push(createEnemy(540, 60));
-  // ↑ 授業でくじの敵を足した人は、その行（const special = … から enemies.push(special); まで）もここへ
-}
-
-enemies.push(createEnemy(200, 80));
-enemies.push(createEnemy(380, -120));
-enemies.push(createEnemy(540, 60));
-const special = createEnemy(300, 80);  //見張りの敵初期,位置から左右に80px
+  const special = createEnemy(300, 80);  //見張りの敵初期,位置から左右に80px
 special.type="look";
 enemies.push(special);
+  // ↑ 授業でくじの敵を足した人は、その行（const special = … から enemies.push(special); まで）もここへ
+}
 
 // ③ 動かす：配列の敵を1体ずつ取り出して、同じ処理をする
 function updateEnemies(dt) {
@@ -55,6 +51,7 @@ function collideWithEnemies(prevBottom) {
     if (aabb(player, enemy) && prevBottom <= enemy.y && player.vy > 0) {
       enemy.alive = false;            // 倒した（状態を書き換える）
       player.vy = -JUMP_SPEED / 2;    // 踏んだら、少し跳ねる
+      score = score + 1;              // 点数を足す（★ main.js の score を書き換える）
     } else if (aabb(player, enemy) && player.hitTimer <= 0) {
       player.hp = player.hp - 1;      // 横から当たった：HP を減らす（★ player.js の値を書き換える）
       player.hitTimer = HIT_TIME;     // しばらく当たらない

@@ -1,8 +1,8 @@
 // プレイヤー：決まった数・今の値・キー・動き・描き方
 
 const GRAVITY = 2000;
-const JUMP_SPEED = 700;
-const MOVE_SPEED = 240;
+const JUMP_SPEED = 800;
+const MOVE_SPEED = 300;
 const MAX_JUMPS = 2;          // 地面を離れてから跳べる回数（2段ジャンプ）
 const FALL_GRAVITY_RATE = 2;  // 落ちるときは、重力を何倍にするか
 const MAX_HP = 3;             // HP の最大

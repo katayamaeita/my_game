@@ -12,6 +12,7 @@ let enemies = [];
 let spawnTimer = 0;   // 敵を出すタイマー
 let nextSpawn = 2;    // 次の敵を出すまでの時間（秒）
 let spTimer = 0;
+let unTimer = 0;
 
 // 最初の敵を入れ直す（★ main.js の resetGame から呼ばれる）
 function resetEnemies() {
@@ -31,6 +32,7 @@ function resetEnemies() {
 function spawnEnemies(dt) {
   spawnTimer = spawnTimer + dt;
   spTimer = spTimer + dt;
+  unTimer = unTimer + dt;
   if (spawnTimer >= nextSpawn) {
     if (enemies.length < MAX_ENEMIES) {
       // 左の端か右の端か、くじで決める
@@ -43,13 +45,21 @@ function spawnEnemies(dt) {
     spawnTimer = 0;
     nextSpawn = 1 + Math.random() * 2;   // 次は 1〜3 秒のどれか
   }
-  if (spTimer >= 20) {
+  if (spTimer >= 5) {
+    if (enemies.length < MAX_ENEMIES) {
+      const special = createEnemy(300, 80);  //見張りの敵初期,位置から左右に80px
+      special.type="look";
+      enemies.push(special);
+    }
+    spTimer = 0;
+  }
+  if (unTimer >= 10) {
     if (enemies.length < MAX_ENEMIES) {
       const unique = createEnemy(0, 100, -JUMP_SPEED * 0.8);
       unique.type = "jump";
       enemies.push(unique);
     }
-    spTimer = 0;
+    unTimer = 0;
   }
 }
  
@@ -91,23 +101,41 @@ function updateEnemies(dt) {
 }
 // プレイヤーとぶつかったとき：上から落ちてきたときだけ、敵を倒す
 function collideWithEnemies(prevBottom) {
+  let stomped = false;
+
   for (const enemy of enemies) {
     if (aabb(player, enemy) && prevBottom <= enemy.y && player.vy > 0) {
       enemy.alive = false;            // 倒した（状態を書き換える）
-      player.vy = -JUMP_SPEED / 2;    // 踏んだら、少し跳ねる
       score = score + 1;              // 点数を足す（★ main.js の score を書き換える）
-    } else if (aabb(player, enemy) && player.hitTimer <= 0) {
+      stomped = true;
+      }
+    }
+    
+    if (stomped) {
+    player.vy = -JUMP_SPEED / 2;
+    }
+
+  for (const enemy of enemies) {
+    if (enemy.alive && aabb(player, enemy) && player.hitTimer <= 0) {
       player.hp = player.hp - 1;      // 横から当たった：HP を減らす（★ player.js の値を書き換える）
       player.hitTimer = HIT_TIME;     // しばらく当たらない
     }
   }
   enemies = enemies.filter((enemy) => enemy.alive);   // 生きている敵だけを残す
+  
 }  
    
 // ④ 描く：配列の敵を1体ずつ取り出して描く
 function drawEnemies() {
   ctx.fillStyle = "#ff6b6b";
   for (const enemy of enemies) {
+    ctx.fillStyle = "#ff6b6b";
+    if(enemy.type === "look"){
+      ctx.fillStyle = "#6bc4ff";
+    }
+    if(enemy.type === "jump"){
+      ctx.fillStyle = "#fffc46";
+    }
     ctx.fillRect(enemy.x, enemy.y, enemy.w, enemy.h);
   }
   ctx.fillStyle = "#e8eeff";

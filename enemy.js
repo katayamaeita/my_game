@@ -3,14 +3,15 @@
 const MAX_ENEMIES = 6;   // 敵は、同時にこの数まで
  
 // ① 作る：敵を1体作って返す関数（呼ぶたびに、新しい敵が1体できる）
-function createEnemy(x, vx) {
-  return { x: x,startX: x, y: floor.y - 32, w: 32, h: 32, vx: vx, alive: true };
+function createEnemy(x, vx,vy = 0) {
+  return { x: x,startX: x, y: floor.y - 32, w: 32, h: 32, vx: vx, vy: vy,alive: true };
 }
 
 // ② 入れる：敵をまとめて入れる配列（７-６で入れ直すので let）
 let enemies = [];
 let spawnTimer = 0;   // 敵を出すタイマー
 let nextSpawn = 2;    // 次の敵を出すまでの時間（秒）
+let spTimer = 0;
 
 // 最初の敵を入れ直す（★ main.js の resetGame から呼ばれる）
 function resetEnemies() {
@@ -29,6 +30,7 @@ function resetEnemies() {
 // 敵を時間で出す（タイマーの形・くり返す）
 function spawnEnemies(dt) {
   spawnTimer = spawnTimer + dt;
+  spTimer = spTimer + dt;
   if (spawnTimer >= nextSpawn) {
     if (enemies.length < MAX_ENEMIES) {
       // 左の端か右の端か、くじで決める
@@ -40,6 +42,14 @@ function spawnEnemies(dt) {
     }
     spawnTimer = 0;
     nextSpawn = 1 + Math.random() * 2;   // 次は 1〜3 秒のどれか
+  }
+  if (spTimer >= 20) {
+    if (enemies.length < MAX_ENEMIES) {
+      const unique = createEnemy(0, 100, -JUMP_SPEED * 0.8);
+      unique.type = "jump";
+      enemies.push(unique);
+    }
+    spTimer = 0;
   }
 }
  
@@ -65,6 +75,16 @@ function updateEnemies(dt) {
       if(enemy.x < enemy.startX - 80){
         enemy.x = enemy.startX - 80
         enemy.vx = -enemy.vx;
+      }
+    }
+    if (enemy.type === "jump") {
+      const g = enemy.vy > 0 ? GRAVITY * FALL_GRAVITY_RATE : GRAVITY;
+      enemy.vy = enemy.vy + g * dt;
+      enemy.y = enemy.y + enemy.vy * dt;
+
+      if (enemy.y + enemy.h >= floor.y) {
+        enemy.y = floor.y - enemy.h;
+        enemy.vy = -JUMP_SPEED * 0.8;
       }
     }
   }
